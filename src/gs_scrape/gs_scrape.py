@@ -3,9 +3,6 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import pandas as pd
-import matplotlib.pyplot as plt
-import csv
-import json
 import lxml
 
 class GSscaper():
@@ -24,13 +21,33 @@ class GSscaper():
         Extract paper's information including the number of being cited.
 
         
-        required parameters
-        -------------------
+
+        Parameters
+        ----------
+
         q : search query (e.g., "machine learing", "causal model", and so on)
         
         year : the year of publication at leat (if you prefer the latest research papers, please set the nearest years.) 
         
         maxpage : number of resulting pages you want to extrat. Each page has ten articles(or references).
+
+
+        
+        Returns
+        --------
+        _gs_paper_content() method returns paper's information data in a python dictioonnary format. 
+
+        It includes title, author, document link, and number of being cited for each paper. 
+
+        {'publication id': {'title' : the title of the paper, 'author': author(s) of the paper, 'access': document link, 'numCited': number of being cited}}
+
+
+        Examples
+        ---------
+        >>>gs=GSscaper() # create an instance
+
+        >>>gs._gs_paper_content(q='samsung')
+        {'A-lxPM4d9bQJ': {'title': 'The Influence of Brand Image and Atmosphere Store on Purchase Decision for Samsung Brand Smartphone with Buying Intervention a ....}
 
         """
         self.params['q']=str(q)
@@ -69,15 +86,30 @@ class GSscaper():
         """
         Extract the paper's citation reference for a single paper (too many trials might end up with being blocked.)
 
-        parameter 
+        Parameter 
         ---------
-        pid: publication id (you can find it from self.paperdata.) 
+        pid: publication id (pids are generated and store in self.paperdata).
+
+        
+        Returns
+        --------
+        get_citation() methods provides citation references in different ciation format. The data is stored in dictionary format. 
+
+
+        Example
+        --------
+        >>>gs=GSscaper() # create an instance
+
+        >>>gs._gs_paper_content(q='samsung')
+        {'A-lxPM4d9bQJ': {'title': 'The Influence of Brand Image and Atmosphere Store on Purchase Decision for Samsung Brand Smartphone with Buying Intervention a ....}
+        
+        >>>gs.get_citation(pid='A-lxPM4d9bQJ')
+        {'A-lxPM4d9bQJ': {'Citation': {'MLA': ...., 'APA':...., 'Chicago':...., 'Harvard': ...., 'Vancouver: ....,}}
 
         """
         citations={}
-        pid='whnjfQ8JSBEJ'
         url=f'https://scholar.google.com/scholar?output=cite&q=info:{pid}:scholar.google.com'
-        response=requests.get(url, headers=headers)
+        response=requests.get(url, headers=self.headers)
         response
         soup=BeautifulSoup(response.content, 'lxml')
         lists = soup.select('tr')
@@ -97,16 +129,30 @@ class GSscaper():
         Write in a csv file (save the file in the current working directory)
         The file name is automatically created from 'query kewword'.
 
+        Returns
+        -------
+        save_csv() method transform the paperdata dictionary into a DataFrame object and store it into .csv file in the current working directory. 
+        Filename is 'query'.csv 
+
+        Example
+        -------
+        >>>gs=GSscaper() # create an instance
+
+        >>>gs._gs_paper_content(q='samsung')
+        {'A-lxPM4d9bQJ': {'title': 'The Influence of Brand Image and Atmosphere Store on Purchase Decision for Samsung Brand Smartphone with Buying Intervention a ....}
+        
+        >>>gs.save_csv()
+
         """
         searchkw=self.params['q'].replace(" ", "_").lower()
-        searchkw="dfd"
         filename=searchkw+".csv"
 
-        if type=="csv":
-            df=pd.DataFrame(self.paperdata).T
-            df.to_csv(filename)
+        df=pd.DataFrame(self.paperdata).T
+        df.to_csv(filename)
 
                
 gs=GSscaper()
-gs._gs_paper_content()
-gs.get_citation()
+gs._gs_paper_content(q='samsung')
+gs.paperdata.keys()
+gs.get_citation(pid='A-lxPM4d9bQJ')
+gs.save_csv()

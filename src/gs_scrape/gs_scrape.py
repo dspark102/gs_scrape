@@ -150,9 +150,3 @@ class GSscaper():
         df=pd.DataFrame(self.paperdata).T
         df.to_csv(filename)
 
-               
-gs=GSscaper()
-gs._gs_paper_content(q='samsung')
-gs.paperdata.keys()
-gs.get_citation(pid='A-lxPM4d9bQJ')
-gs.save_csv()

@@ -197,4 +197,3 @@ class GSscraper():
         plt.show() # show the bar plot 
 
 
-

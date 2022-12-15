@@ -4,8 +4,13 @@ from bs4 import BeautifulSoup
 import re
 import pandas as pd
 import lxml
+import time
+import random
+import matplotlib.pyplot as plt
+import numpy as np
 
-class GSscaper():
+
+class GSscraper():
     
     def __init__(self):
         self.params={'q':'machine', 'as_ylo':2021, 'hl':'en', 'start':0} 
@@ -44,7 +49,9 @@ class GSscaper():
 
         Examples
         ---------
-        >>>gs=GSscaper() # create an instance
+        >>>from gs_scrape import gs_scrape
+
+        >>>gs=gs_scrape.GSscaper() # create an instance
 
         >>>gs._gs_paper_content(q='samsung')
         {'A-lxPM4d9bQJ': {'title': 'The Influence of Brand Image and Atmosphere Store on Purchase Decision for Samsung Brand Smartphone with Buying Intervention a ....}
@@ -55,6 +62,7 @@ class GSscaper():
 
         data={}
         while self.params['start']<(maxpage*10):
+            time.sleep(random.randint(1,10))
             response=requests.get('https://scholar.google.com/scholar', headers=self.headers, params=self.params)
             print(response)
             soup=BeautifulSoup(response.content, 'lxml')
@@ -98,7 +106,9 @@ class GSscaper():
 
         Example
         --------
-        >>>gs=GSscaper() # create an instance
+        >>>from gs_scrape import gs_scrape
+
+        >>>gs=gs_scrape.GSscaper() # create an instance
 
         >>>gs._gs_paper_content(q='samsung')
         {'A-lxPM4d9bQJ': {'title': 'The Influence of Brand Image and Atmosphere Store on Purchase Decision for Samsung Brand Smartphone with Buying Intervention a ....}
@@ -107,13 +117,13 @@ class GSscaper():
         {'A-lxPM4d9bQJ': {'Citation': {'MLA': ...., 'APA':...., 'Chicago':...., 'Harvard': ...., 'Vancouver: ....,}}
 
         """
-        citations={}
-        url=f'https://scholar.google.com/scholar?output=cite&q=info:{pid}:scholar.google.com'
-        response=requests.get(url, headers=self.headers)
-        response
-        soup=BeautifulSoup(response.content, 'lxml')
-        lists = soup.select('tr')
-        citation={}
+        citations={} # empty dictionary for citations
+        url=f'https://scholar.google.com/scholar?output=cite&q=info:{pid}:scholar.google.com' # url for the citations of specific paper
+        response=requests.get(url, headers=self.headers) # request html page
+        response # check the response code (expecting 200)
+        soup=BeautifulSoup(response.content, 'lxml') # rearrange with Beautiful soup
+        lists = soup.select('tr') 
+        citation={} # empty dictionary for a single type of citation
         for list in lists:
             ins=list.select('th')[0].get_text()
             cit=list.select('.gs_citr')[0].get_text()
@@ -136,7 +146,9 @@ class GSscaper():
 
         Example
         -------
-        >>>gs=GSscaper() # create an instance
+        >>>from gs_scrape import gs_scrape
+
+        >>>gs=gs_scrape.GSscaper() # create an instance
 
         >>>gs._gs_paper_content(q='samsung')
         {'A-lxPM4d9bQJ': {'title': 'The Influence of Brand Image and Atmosphere Store on Purchase Decision for Samsung Brand Smartphone with Buying Intervention a ....}
@@ -144,9 +156,42 @@ class GSscaper():
         >>>gs.save_csv()
 
         """
-        searchkw=self.params['q'].replace(" ", "_").lower()
-        filename=searchkw+".csv"
+        searchkw=self.params['q'].replace(" ", "_").lower() # replace blank in search query to '-'.
+        filename=searchkw+".csv" # create a filename as .csv
 
-        df=pd.DataFrame(self.paperdata).T
-        df.to_csv(filename)
+        df=pd.DataFrame(self.paperdata).T # transform the paperdata list to pandas' data frame.
+        df.to_csv(filename) # save the dataframe as .csv format with the search query name
+
+    def citation_graph(self):
+
+        """
+        Create a bar graph of number of being ciated by a paper (or any types of document) after you extract the paper data using 
+        key 'query' from the  _gs_paper_content() method.
+
+        Returns
+        -------
+        citation_graph() method provide a horizontal bar graphs.  
+
+        Example
+        -------
+
+        >>>from gs_scrape import gs_scrape
+
+        >>>gs=gs_scrape.GSscraper() # create an instance
+
+        >>>gs._gs_paper_content(q='machine learning')
+        
+        >>>gs.citation_graph()
+
+        """
+
+        info=self.paperdata # read paperdata from the class
+        df=pd.DataFrame(info).T # transpose the data frame
+        df['numCited']=df['numCited'].apply(int) # change 'numCited' data into integel type.
+        y_pos=np.arange(len(df['numCited'])) # y position labels 
+        titlename=[" ".join(a.split(" ")[0:5])+"..." for a in df['title']] # paper tile names list
+        plt.barh(y_pos,df['numCited'] ) # horizontal bar plot with 'numCited' column data
+        plt.subplots_adjust(left=0.6) # modify the left margin so that we can see the paper title as much as possible.
+        plt.yticks(y_pos, titlename) # pass the titlename into y ticks.
+        plt.show() # show the bar plot 
 

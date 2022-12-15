@@ -1,6 +1,16 @@
 # gs_scrape
 
-Extract Google Scholar search results
+Extract Google Scholar search results.
+
+gs_scrape is a customized GoogleScholar research results scraping tool. You can extract any publications with user's own 'key words', 'year of publication', 'number of pages'.
+
+All publication's information such as publication id (used in GoogleScholar), title, author(s), digital document location, numbers of being cited are stored. 
+
+Using the publication ids, you can further extract the useful (different) types of citation format. Basically GoogleScholar provides five differnt citation format (e.g., APA, Chicago, Harvard and so on). Extract and download the citations are super useful and time-saving method in particular for those who are instantaly save the right form of citation. You can save the data in .csv file. 
+
+Lastly, citation_graph method provide horizontal bar chart to visually check which publications are most citied so far. 
+
+
 
 ## Installation
 
@@ -9,6 +19,8 @@ $ pip install gs_scrape
 ```
 
 ## Usage
+
+- vignette.ipynb file is provided as an example
 
 - https://gs-scrape.readthedocs.io/en/latest/
 

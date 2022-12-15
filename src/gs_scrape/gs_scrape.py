@@ -162,6 +162,7 @@ class GSscraper():
         df=pd.DataFrame(self.paperdata).T # transform the paperdata list to pandas' data frame.
         df.to_csv(filename) # save the dataframe as .csv format with the search query name
 
+
     def citation_graph(self):
 
         """
@@ -176,7 +177,7 @@ class GSscraper():
         -------
 
         >>>from gs_scrape import gs_scrape
-
+           
         >>>gs=gs_scrape.GSscraper() # create an instance
 
         >>>gs._gs_paper_content(q='machine learning')
@@ -194,4 +195,6 @@ class GSscraper():
         plt.subplots_adjust(left=0.6) # modify the left margin so that we can see the paper title as much as possible.
         plt.yticks(y_pos, titlename) # pass the titlename into y ticks.
         plt.show() # show the bar plot 
+
+
 

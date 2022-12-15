@@ -10,7 +10,7 @@ $ pip install gs_scrape
 
 ## Usage
 
-- TODO
+- https://gs-scrape.readthedocs.io/en/latest/
 
 ## Contributing
 
